@@ -434,6 +434,12 @@ class JustArrangeGame {
             this.bgmGainNode.gain.setValueAtTime(bgmVolume, this.audioContext.currentTime);
         }
         
+        // 勝利BGMが再生中の場合も音量を更新
+        if (this.victoryGainNode && this.audioContext) {
+            const victoryVolume = this.masterVolume * 0.3; // 勝利BGM音量係数
+            this.victoryGainNode.gain.setValueAtTime(victoryVolume, this.audioContext.currentTime);
+        }
+        
         // ビクトリーBGMが再生中の場合も音量を更新
         if (this.victoryAudio) {
             this.victoryAudio.volume = this.masterVolume * 0.5; // ビクトリー音量係数
@@ -1323,10 +1329,11 @@ class JustArrangeGame {
         if (!this.audioContext) return;
         
         try {
-            // 勝利BGM用のゲインノード作成
+            // 勝利BGM用のゲインノード作成（マスター音量を適用）
             this.victoryGainNode = this.audioContext.createGain();
             this.victoryGainNode.connect(this.audioContext.destination);
-            this.victoryGainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+            const victoryVolume = this.masterVolume * 0.3; // マスター音量を適用
+            this.victoryGainNode.gain.setValueAtTime(victoryVolume, this.audioContext.currentTime);
             
             // 壮大な勝利ファンファーレのメロディー（オーケストラ風）
             const fanfareMelody = [
@@ -1925,7 +1932,7 @@ class JustArrangeGame {
                 </div>
                 
                 <div class="score-showcase" style="background: rgba(255,255,255,0.1); border-radius: 20px; padding: 30px; margin: 30px auto; max-width: 400px; animation: scoreFloat 4s ease-in-out infinite;">
-                    <div class="final-score" style="font-size: 3rem; color: #ffd700; font-weight: bold; margin-bottom: 20px; text-shadow: 0 0 20px #ffd700;">
+                    <div class="final-score" style="font-size: 3rem; color: #ffd700; font-weight: bold; margin-bottom: 20px; text-shadow: 0 2px 6px rgba(255, 215, 0, 0.4);">
                         ${finalScore.toLocaleString()}点
                     </div>
                     
@@ -2025,18 +2032,24 @@ class JustArrangeGame {
             }
             
             @keyframes titleGlow {
-                0%, 100% { text-shadow: 0 0 10px #667eea; }
-                50% { text-shadow: 0 0 20px #667eea, 0 0 30px #667eea; }
+                0%, 100% { 
+                    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+                    color: #4a67d1;
+                }
+                50% { 
+                    text-shadow: 0 2px 8px rgba(102, 126, 234, 0.5);
+                    color: #667eea;
+                }
             }
             
             @keyframes badgeShine {
-                0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
-                50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+                0%, 100% { transform: scale(1); box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3); }
+                50% { transform: scale(1.02); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5); }
             }
             
             @keyframes scoreFloat {
                 0%, 100% { transform: translateY(0px); }
-                50% { transform: translateY(-10px); }
+                50% { transform: translateY(-5px); }
             }
             
             @keyframes buttonPulse {
