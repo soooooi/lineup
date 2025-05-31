@@ -3,16 +3,33 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    /* 絵文字やアイテムの文字選択を防止 */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* タッチ時のハイライトを無効化 */
+    -webkit-tap-highlight-color: transparent;
+    /* iOS Safariのズーム無効化 */
+    -webkit-touch-callout: none;
 }
 
 body {
     font-family: 'Noto Sans JP', sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS Safari対応 */
     display: flex;
     align-items: center;
     justify-content: center;
     overflow-x: hidden;
+    /* スクロールバーを隠す */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+    display: none;
 }
 
 .game-container {
@@ -31,21 +48,21 @@ body {
 }
 
 .game-title {
-    font-size: 3rem;
+    font-size: clamp(2.5rem, 6vw, 3rem);
     font-weight: 300;
     margin-bottom: 10px;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
 .game-subtitle {
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 3vw, 1.2rem);
     opacity: 0.8;
     font-weight: 300;
     margin-bottom: 20px;
 }
 
 .game-author {
-    font-size: 0.8rem;
+    font-size: clamp(0.75rem, 2vw, 0.8rem);
     opacity: 0.6;
     font-weight: 300;
     margin-bottom: 20px;
@@ -60,15 +77,16 @@ body {
     border-radius: 25px;
     display: inline-block;
     backdrop-filter: blur(10px);
+    margin-bottom: 10px;
 }
 
 .stage-label {
-    font-size: 0.9rem;
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
     opacity: 0.8;
 }
 
 .stage-number {
-    font-size: 1.5rem;
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
     font-weight: 500;
     margin-left: 10px;
 }
@@ -83,25 +101,32 @@ body {
     background: rgba(74, 144, 226, 0.1);
     border-radius: 8px;
     border: 1px solid rgba(74, 144, 226, 0.2);
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .audio-toggle-btn {
     background: linear-gradient(135deg, #4a90e2, #357abd);
     border: none;
     border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    width: clamp(36px, 8vw, 40px);
+    height: clamp(36px, 8vw, 40px);
     cursor: pointer;
-    font-size: 16px;
+    font-size: clamp(16px, 4vw, 18px);
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* タッチサイズを確保 */
+    min-width: 44px;
+    min-height: 44px;
 }
 
-.audio-toggle-btn:hover {
+.audio-toggle-btn:hover,
+.audio-toggle-btn:focus {
     transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -115,10 +140,11 @@ body {
     align-items: center;
     gap: 8px;
     flex: 1;
+    min-width: 0;
 }
 
 .volume-icon {
-    font-size: 14px;
+    font-size: clamp(14px, 3.5vw, 16px);
     opacity: 0.7;
 }
 
@@ -130,12 +156,13 @@ body {
     border-radius: 3px;
     outline: none;
     transition: all 0.3s ease;
+    min-height: 6px;
 }
 
 .volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
+    width: clamp(18px, 4.5vw, 20px);
+    height: clamp(18px, 4.5vw, 20px);
     border-radius: 50%;
     background: linear-gradient(135deg, #4a90e2, #357abd);
     cursor: pointer;
@@ -150,8 +177,8 @@ body {
 }
 
 .volume-slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
+    width: clamp(18px, 4.5vw, 20px);
+    height: clamp(18px, 4.5vw, 20px);
     border-radius: 50%;
     background: linear-gradient(135deg, #4a90e2, #357abd);
     cursor: pointer;
@@ -161,7 +188,7 @@ body {
 }
 
 .volume-percentage {
-    font-size: 12px;
+    font-size: clamp(12px, 3vw, 14px);
     font-weight: 500;
     color: #4a90e2;
     min-width: 32px;
@@ -176,11 +203,12 @@ body {
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     backdrop-filter: blur(10px);
     transition: opacity 0.3s ease, transform 0.3s ease;
+    margin-bottom: 20px;
 }
 
 .theme-hint {
     text-align: center;
-    font-size: 1.1rem;
+    font-size: clamp(1rem, 3vw, 1.1rem);
     color: #666;
     margin-bottom: 30px;
     font-style: italic;
@@ -214,7 +242,7 @@ body {
 
 .drop-hint {
     color: #999;
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
     pointer-events: none;
 }
 
@@ -237,125 +265,165 @@ body {
 
 /* ドラッグ可能なアイテム */
 .draggable-item {
-    width: 80px;
-    height: 80px;
+    width: clamp(70px, 15vw, 80px);
+    height: clamp(70px, 15vw, 80px);
     border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
+    font-size: clamp(2.2rem, 6vw, 2.5rem);
     cursor: grab;
     user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     transition: all 0.3s ease;
     background: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     border: 2px solid transparent;
-    position: relative;
+    /* タッチデバイス用の最小サイズ確保 */
+    min-width: 44px;
+    min-height: 44px;
+    /* タッチ時の遅延を削減 */
+    touch-action: none;
+    /* 長押し時のコンテキストメニューを無効化 */
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.draggable-item:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+.draggable-item:hover,
+.draggable-item:focus {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
 .draggable-item:active {
     cursor: grabbing;
-    transform: scale(1.1) rotate(5deg);
+    transform: scale(1.1);
 }
 
 .draggable-item.dragging {
-    opacity: 0.7;
-    transform: scale(1.1) rotate(10deg);
+    opacity: 0.8;
+    transform: rotate(5deg) scale(1.1);
     z-index: 1000;
 }
 
 .draggable-item.in-zone {
-    cursor: grab;
-    margin: 5px;
+    border-color: #667eea;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
 }
 
 .draggable-item.in-zone:hover {
-    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 25px rgba(102, 126, 234, 0.5);
+}
+
+/* タッチドラッグ用プレースホルダー */
+.draggable-item.placeholder {
+    opacity: 0.3 !important;
+    transform: scale(0.9) !important;
+    border: 2px dashed #667eea !important;
+    background: rgba(102, 126, 234, 0.1) !important;
+    pointer-events: none !important;
 }
 
 /* フィードバックエリア */
 .feedback-area {
     text-align: center;
-    min-height: 80px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     position: relative;
+    min-height: 120px; /* 高さを増やして重なりを防ぐ */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px; /* アニメーションとテキストの間隔 */
 }
 
 .feedback-animation {
-    min-height: 60px;
+    font-size: clamp(3rem, 8vw, 4rem);
+    pointer-events: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
+    min-height: 60px; /* アニメーション専用の高さ */
+    flex-shrink: 0; /* 縮小を防ぐ */
 }
 
 .feedback-text {
-    font-size: 1.2rem;
-    color: #666;
-    margin-top: 10px;
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-weight: 500;
     opacity: 0;
-    transition: opacity 0.5s ease;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
     line-height: 1.4;
-    transition: font-size 0.3s ease;
+    max-width: 100%;
+    text-align: center;
+    /* テキストが長い場合の調整 */
+    word-wrap: break-word;
+    flex-shrink: 0; /* 縮小を防ぐ */
 }
 
 .feedback-text.show {
     opacity: 1;
+    transform: translateY(0);
 }
 
-/* コントロールボタン */
+/* コントロール */
 .controls {
     display: flex;
     gap: 15px;
     justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 .btn {
     padding: 12px 24px;
     border: none;
     border-radius: 25px;
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 3vw, 1rem);
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-family: inherit;
+    /* タッチサイズを確保 */
+    min-width: 44px;
+    min-height: 44px;
+    /* タッチ対応 */
+    touch-action: manipulation;
 }
 
 .btn-reset {
-    background: #ff6b6b;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
     color: white;
 }
 
-.btn-reset:hover {
-    background: #ff5252;
+.btn-reset:hover,
+.btn-reset:focus {
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
 }
 
 .btn-next {
-    background: #4ecdc4;
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
     color: white;
-    animation: pulse 2s infinite;
 }
 
-.btn-next:hover {
-    background: #8ba5ff;
+.btn-next:hover,
+.btn-next:focus {
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(78, 205, 196, 0.3);
 }
 
 .btn-skip {
-    background: linear-gradient(135deg, #ff9a56, #ff6b6b);
+    background: linear-gradient(135deg, #feca57, #ff9ff3);
     color: white;
+    position: relative;
 }
 
-.btn-skip:hover {
-    background: linear-gradient(135deg, #ff8a40, #ff5555);
+.btn-skip:hover,
+.btn-skip:focus {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 154, 86, 0.4);
+    box-shadow: 0 4px 8px rgba(254, 202, 87, 0.3);
 }
 
 /* 成功時のアニメーション */
@@ -407,8 +475,8 @@ body {
 
 .particle {
     position: absolute;
-    width: 6px;
-    height: 6px;
+    width: clamp(4px, 1.5vw, 6px);
+    height: clamp(4px, 1.5vw, 6px);
     background: #ffd700;
     border-radius: 50%;
     animation: particle-fall 3s linear forwards;
@@ -445,7 +513,7 @@ body {
 
 .progress-text {
     text-align: center;
-    font-size: 0.9rem;
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
     color: rgba(255, 255, 255, 0.8);
     margin-top: 5px;
 }
@@ -477,63 +545,15 @@ body {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.3s ease;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
+    z-index: 100;
 }
 
 #score-display:hover {
     background: rgba(255, 255, 255, 0.2);
-}
-
-/* レスポンシブデザイン */
-@media (max-width: 768px) {
-    .game-container {
-        padding: 10px;
-    }
-    
-    .game-title {
-        font-size: 2.5rem;
-    }
-    
-    .game-main {
-        padding: 20px;
-    }
-    
-    .draggable-item {
-        width: 70px;
-        height: 70px;
-        font-size: 2rem;
-    }
-    
-    .items-pool {
-        gap: 10px;
-    }
-    
-    .controls {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    #score-display {
-        top: 5px;
-        right: 5px;
-        font-size: 0.9rem;
-        padding: 6px 10px;
-    }
-    
-    .progress-container {
-        margin-bottom: 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    .game-title {
-        font-size: 2rem;
-    }
-    
-    .draggable-item {
-        width: 60px;
-        height: 60px;
-        font-size: 1.8rem;
-    }
 }
 
 /* BGMトグルボタン */
@@ -546,15 +566,21 @@ body {
     color: #667eea;
     border: 2px solid #667eea;
     border-radius: 20px;
-    font-size: 0.85rem;
+    font-size: clamp(0.75rem, 2.5vw, 0.85rem);
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
     z-index: 1001;
+    /* タッチサイズを確保 */
+    min-width: 44px;
+    min-height: 44px;
+    /* タッチ対応 */
+    touch-action: manipulation;
 }
 
-.bgm-toggle:hover {
+.bgm-toggle:hover,
+.bgm-toggle:focus {
     background: #667eea;
     color: white;
     transform: translateY(-1px);
@@ -563,4 +589,291 @@ body {
 .bgm-toggle.active {
     background: #667eea;
     color: white;
+}
+
+/* レスポンシブデザイン - タブレット向け */
+@media (max-width: 1024px) and (orientation: portrait) {
+    .game-container {
+        max-width: min(90vw, 800px);
+        padding: min(1.5vh, 15px);
+    }
+    
+    .game-main {
+        padding: min(2.5vh, 25px);
+    }
+    
+    .draggable-item {
+        width: clamp(60px, 12vw, 70px);
+        height: clamp(60px, 12vw, 70px);
+        font-size: clamp(1.8rem, 5vw, 2.2rem);
+    }
+}
+
+/* レスポンシブデザイン - スマートフォン向け */
+@media (max-width: 768px) {
+    body {
+        /* 背景グラデーションを維持 */
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+        /* iOS のバウンス効果を無効化（position: fixedを使わずに） */
+        overscroll-behavior: none;
+        -webkit-overscroll-behavior: none;
+    }
+    
+    .game-container {
+        max-width: min(95vw, 800px);
+        padding: min(1vh, 10px);
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+        display: flex;
+        flex-direction: column;
+        /* スクロール制御を.game-containerで行う */
+        overflow-y: auto;
+        overflow-x: hidden;
+        /* iOS Safari のバウンス効果をここでも制御 */
+        overscroll-behavior: none;
+        -webkit-overscroll-behavior: none;
+    }
+    
+    .game-header {
+        margin-bottom: min(2vh, 20px);
+        flex-shrink: 0;
+    }
+    
+    .game-title {
+        font-size: clamp(1.8rem, 5vw, 2.5rem);
+    }
+    
+    .game-main {
+        border-radius: min(2vh, 20px);
+        padding: min(2vh, 20px);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        /* .game-main内でのスクロールは制御しない */
+        margin-bottom: min(1vh, 10px);
+    }
+    
+    .theme-hint {
+        margin-bottom: min(2vh, 20px);
+    }
+    
+    .arrangement-area {
+        margin-bottom: min(2vh, 20px);
+    }
+    
+    .drop-zone {
+        min-height: min(8vh, 80px);
+        padding: min(1.5vh, 15px);
+        border-radius: min(1.5vh, 15px);
+    }
+    
+    .items-pool {
+        gap: min(1vh, 10px);
+        padding: min(1.5vh, 15px);
+        margin-bottom: min(2vh, 20px);
+        border-radius: min(1.5vh, 15px);
+    }
+    
+    .draggable-item {
+        width: clamp(50px, 12vw, 70px);
+        height: clamp(50px, 12vw, 70px);
+        font-size: clamp(1.6rem, 4.5vw, 2rem);
+        border-radius: min(1.5vh, 15px);
+    }
+    
+    /* スマホ向けフィードバックエリア調整 */
+    .feedback-area {
+        min-height: min(10vh, 100px);
+        margin-bottom: min(2vh, 20px);
+        gap: min(1vh, 10px);
+    }
+    
+    .feedback-animation {
+        min-height: min(5vh, 50px);
+        font-size: clamp(2.5rem, 7vw, 3.5rem);
+    }
+    
+    .feedback-text {
+        font-size: clamp(0.9rem, 2.8vw, 1.1rem);
+        line-height: 1.3;
+        padding: 0 5px;
+    }
+    
+    .controls {
+        flex-direction: row;
+        justify-content: center;
+        gap: min(1vh, 10px);
+        margin-top: auto;
+        padding-top: min(1vh, 10px);
+    }
+    
+    .btn {
+        padding: min(1vh, 10px) min(2vh, 20px);
+        font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+        border-radius: min(2.5vh, 25px);
+    }
+    
+    .audio-controls {
+        margin: min(0.5vh, 5px) 0;
+        padding: min(0.6vh, 6px) min(1vh, 10px);
+        border-radius: min(0.8vh, 8px);
+        gap: min(1vw, 10px);
+    }
+    
+    #score-display {
+        top: min(0.5vh, 5px);
+        right: min(0.5vh, 5px);
+        font-size: clamp(0.7rem, 2vw, 0.9rem);
+        padding: min(0.6vh, 6px) min(1vh, 10px);
+        border-radius: min(2vh, 20px);
+    }
+    
+    .progress-container {
+        margin-bottom: min(1vh, 10px);
+        height: min(0.8vh, 8px);
+    }
+    
+    .progress-text {
+        margin-top: min(0.5vh, 5px);
+    }
+}
+
+/* 極小スマートフォン向け */
+@media (max-width: 480px) {
+    .game-title {
+        font-size: clamp(1.5rem, 4.5vw, 2rem);
+    }
+    
+    .draggable-item {
+        width: clamp(45px, 11vw, 60px);
+        height: clamp(45px, 11vw, 60px);
+        font-size: clamp(1.4rem, 4vw, 1.8rem);
+    }
+    
+    .items-pool {
+        gap: min(0.8vh, 8px);
+        padding: min(1vh, 10px);
+    }
+    
+    .btn {
+        padding: min(0.8vh, 8px) min(1.6vh, 16px);
+        font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+    }
+}
+
+/* 横向きスマートフォン対応 */
+@media (max-width: 768px) and (orientation: landscape) {
+    .game-container {
+        height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: min(1vh, 10px);
+    }
+    
+    .game-header {
+        margin-bottom: 0;
+    }
+    
+    .game-main {
+        display: grid;
+        grid-template-rows: auto auto 1fr auto;
+        gap: min(1vh, 10px);
+        padding: min(1.5vh, 15px);
+    }
+    
+    .theme-hint {
+        margin-bottom: min(1vh, 10px);
+    }
+    
+    .arrangement-area {
+        margin-bottom: min(1vh, 10px);
+    }
+    
+    .items-pool {
+        margin-bottom: min(1vh, 10px);
+    }
+}
+
+/* iOS Safari の viewport 調整 */
+@supports (-webkit-touch-callout: none) {
+    /* モバイルのみでのviewport調整 */
+    @media (max-width: 768px) {
+        body {
+            /* 背景グラデーションを維持しつつ高さ調整 */
+            min-height: -webkit-fill-available;
+            /* より強力なバウンス効果制御 */
+            overscroll-behavior-y: none;
+            -webkit-overscroll-behavior-y: none;
+        }
+        
+        .game-container {
+            min-height: -webkit-fill-available;
+            /* iOS でのプルトゥリフレッシュを無効化 */
+            overscroll-behavior: none;
+            -webkit-overscroll-behavior: none;
+            /* スムーズスクロールを有効化 */
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* タッチイベントでの背景固定を防ぐ */
+        html {
+            /* 背景の固定を防ぐ */
+            background: inherit;
+        }
+    }
+}
+
+/* 安全なタッチエリアの確保（モバイルのみ） */
+@media (pointer: coarse) {
+    .draggable-item,
+    .btn,
+    .audio-toggle-btn,
+    .bgm-toggle {
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    /* タッチデバイスでのホバー効果を無効化 */
+    .draggable-item:hover,
+    .btn:hover,
+    .audio-toggle-btn:hover,
+    .bgm-toggle:hover {
+        transform: none;
+    }
+    
+    /* タッチ時のアクティブ状態 */
+    .draggable-item:active,
+    .btn:active,
+    .audio-toggle-btn:active,
+    .bgm-toggle:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+}
+
+/* ピンチズーム防止の追加対策（モバイルのみ） */
+@media (max-width: 768px) {
+    html {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        touch-action: pan-x pan-y;
+    }
+}
+
+/* ドラッグ中の要素が画面外に出ないよう制限 */
+.draggable-item.dragging {
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+/* 高DPIディスプレイ対応 */
+@media (min-resolution: 2dppx) {
+    .draggable-item {
+        border-width: 1px;
+    }
+    
+    .drop-zone {
+        border-width: 2px;
+    }
 } 

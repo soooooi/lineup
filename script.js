@@ -525,7 +525,22 @@ class JustArrangeGame {
         const itemsPool = document.getElementById('items-pool');
         const dropZone = document.getElementById('drop-zone');
 
-        // ドラッグ開始
+        // タッチデバイス用の変数
+        this.touchData = {
+            isDragging: false,
+            dragElement: null,
+            startX: 0,
+            startY: 0,
+            offsetX: 0,
+            offsetY: 0,
+            longPressTimer: null,
+            placeholder: null
+        };
+
+        // 長押し時間の設定（ミリ秒）
+        const LONG_PRESS_DURATION = 500;
+
+        // ドラッグ開始（デスクトップ）
         itemsPool.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('draggable-item')) {
                 e.target.classList.add('dragging');
@@ -535,7 +550,7 @@ class JustArrangeGame {
             }
         });
 
-        // ドラッグ終了
+        // ドラッグ終了（デスクトップ）
         itemsPool.addEventListener('dragend', (e) => {
             if (e.target.classList.contains('draggable-item')) {
                 e.target.classList.remove('dragging');
@@ -543,7 +558,67 @@ class JustArrangeGame {
             }
         });
 
-        // ドロップゾーンでのドラッグオーバー
+        // タッチ開始（モバイル）
+        itemsPool.addEventListener('touchstart', (e) => {
+            const target = e.target.closest('.draggable-item');
+            if (!target) return;
+
+            e.preventDefault(); // デフォルトの動作を防止
+            const touch = e.touches[0];
+            
+            this.touchData.startX = touch.clientX;
+            this.touchData.startY = touch.clientY;
+            
+            // 長押しタイマーを設定
+            this.touchData.longPressTimer = setTimeout(() => {
+                this.startTouchDrag(target, touch);
+            }, LONG_PRESS_DURATION);
+        }, { passive: false });
+
+        // タッチ移動（モバイル）
+        document.addEventListener('touchmove', (e) => {
+            if (!this.touchData.isDragging) {
+                // ドラッグが開始されていない場合、少しでも動いたら長押しタイマーをクリア
+                const touch = e.touches[0];
+                const deltaX = Math.abs(touch.clientX - this.touchData.startX);
+                const deltaY = Math.abs(touch.clientY - this.touchData.startY);
+                
+                if (deltaX > 10 || deltaY > 10) {
+                    clearTimeout(this.touchData.longPressTimer);
+                }
+                return;
+            }
+
+            e.preventDefault();
+            const touch = e.touches[0];
+            
+            // ドラッグ中の要素の位置を更新
+            if (this.touchData.dragElement) {
+                const x = touch.clientX - this.touchData.offsetX;
+                const y = touch.clientY - this.touchData.offsetY;
+                
+                this.touchData.dragElement.style.position = 'fixed';
+                this.touchData.dragElement.style.left = x + 'px';
+                this.touchData.dragElement.style.top = y + 'px';
+                this.touchData.dragElement.style.zIndex = '1000';
+                this.touchData.dragElement.style.pointerEvents = 'none';
+                
+                // ドロップゾーンとの衝突判定
+                this.checkTouchDropZone(touch.clientX, touch.clientY);
+            }
+        }, { passive: false });
+
+        // タッチ終了（モバイル）
+        document.addEventListener('touchend', (e) => {
+            clearTimeout(this.touchData.longPressTimer);
+            
+            if (this.touchData.isDragging) {
+                e.preventDefault();
+                this.endTouchDrag(e.changedTouches[0]);
+            }
+        }, { passive: false });
+
+        // ドロップゾーンでのドラッグオーバー（デスクトップ）
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropZone.classList.add('drag-over');
@@ -555,7 +630,7 @@ class JustArrangeGame {
             }
         });
 
-        // ドロップ処理
+        // ドロップ処理（デスクトップ）
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('drag-over');
@@ -568,7 +643,7 @@ class JustArrangeGame {
             }
         });
 
-        // ドロップゾーン内でのドラッグ開始
+        // ドロップゾーン内でのドラッグ開始（デスクトップ）
         dropZone.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('draggable-item')) {
                 e.target.classList.add('dragging');
@@ -578,7 +653,7 @@ class JustArrangeGame {
             }
         });
 
-        // ドロップゾーン内での並び替え
+        // ドロップゾーン内での並び替え（デスクトップ）
         dropZone.addEventListener('drop', (e) => {
             const itemData = e.dataTransfer.getData('text/plain');
             const source = e.dataTransfer.getData('source');
@@ -593,6 +668,220 @@ class JustArrangeGame {
                 }
             }
         });
+
+        // ドロップゾーン内でのタッチ開始
+        dropZone.addEventListener('touchstart', (e) => {
+            const target = e.target.closest('.draggable-item');
+            if (!target) return;
+
+            e.preventDefault();
+            const touch = e.touches[0];
+            
+            this.touchData.startX = touch.clientX;
+            this.touchData.startY = touch.clientY;
+            
+            // 長押しタイマーを設定
+            this.touchData.longPressTimer = setTimeout(() => {
+                this.startTouchDragInZone(target, touch);
+            }, LONG_PRESS_DURATION);
+        }, { passive: false });
+    }
+
+    // タッチドラッグ開始
+    startTouchDrag(element, touch) {
+        this.touchData.isDragging = true;
+        this.touchData.dragElement = element;
+        
+        const rect = element.getBoundingClientRect();
+        this.touchData.offsetX = touch.clientX - rect.left;
+        this.touchData.offsetY = touch.clientY - rect.top;
+        
+        // プレースホルダーを作成
+        this.touchData.placeholder = element.cloneNode(true);
+        this.touchData.placeholder.style.opacity = '0.3';
+        this.touchData.placeholder.style.transform = 'scale(0.9)';
+        this.touchData.placeholder.classList.add('placeholder');
+        element.parentNode.insertBefore(this.touchData.placeholder, element);
+        
+        element.classList.add('dragging');
+        element.style.transform = 'scale(1.1) rotate(5deg)';
+        
+        // 触覚フィードバック（対応デバイスのみ・安全に実行）
+        try {
+            if (navigator.vibrate && typeof navigator.vibrate === 'function') {
+                navigator.vibrate(50);
+            }
+        } catch (e) {
+            // 振動が許可されていない場合は無視
+        }
+    }
+
+    // ゾーン内でのタッチドラッグ開始
+    startTouchDragInZone(element, touch) {
+        this.touchData.isDragging = true;
+        this.touchData.dragElement = element;
+        this.touchData.sourceIndex = Array.from(element.parentNode.children).indexOf(element);
+        
+        const rect = element.getBoundingClientRect();
+        this.touchData.offsetX = touch.clientX - rect.left;
+        this.touchData.offsetY = touch.clientY - rect.top;
+        
+        // プレースホルダーを作成
+        this.touchData.placeholder = element.cloneNode(true);
+        this.touchData.placeholder.style.opacity = '0.3';
+        this.touchData.placeholder.style.transform = 'scale(0.9)';
+        this.touchData.placeholder.classList.add('placeholder');
+        element.parentNode.insertBefore(this.touchData.placeholder, element);
+        
+        element.classList.add('dragging');
+        element.style.transform = 'scale(1.1) rotate(5deg)';
+        
+        // 触覚フィードバック（安全に実行）
+        try {
+            if (navigator.vibrate && typeof navigator.vibrate === 'function') {
+                navigator.vibrate(50);
+            }
+        } catch (e) {
+            // 振動が許可されていない場合は無視
+        }
+    }
+
+    // タッチドロップゾーンの衝突判定
+    checkTouchDropZone(x, y) {
+        const dropZone = document.getElementById('drop-zone');
+        const rect = dropZone.getBoundingClientRect();
+        
+        const isOverDropZone = (
+            x >= rect.left &&
+            x <= rect.right &&
+            y >= rect.top &&
+            y <= rect.bottom
+        );
+        
+        if (isOverDropZone) {
+            dropZone.classList.add('drag-over');
+            
+            // ゾーン内での並び替えの場合
+            if (this.touchData.sourceIndex !== undefined) {
+                const items = Array.from(dropZone.children).filter(child => 
+                    child.classList.contains('draggable-item') && !child.classList.contains('placeholder')
+                );
+                
+                // 最も近いアイテムを見つける
+                let closestItem = null;
+                let closestDistance = Infinity;
+                
+                items.forEach(item => {
+                    if (item === this.touchData.dragElement) return;
+                    
+                    const itemRect = item.getBoundingClientRect();
+                    const itemCenterX = itemRect.left + itemRect.width / 2;
+                    const itemCenterY = itemRect.top + itemRect.height / 2;
+                    const distance = Math.sqrt(
+                        Math.pow(x - itemCenterX, 2) + Math.pow(y - itemCenterY, 2)
+                    );
+                    
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestItem = item;
+                    }
+                });
+                
+                // プレースホルダーの位置を更新
+                if (closestItem && this.touchData.placeholder) {
+                    const insertBefore = x < closestItem.getBoundingClientRect().left + closestItem.getBoundingClientRect().width / 2;
+                    if (insertBefore) {
+                        dropZone.insertBefore(this.touchData.placeholder, closestItem);
+                    } else {
+                        dropZone.insertBefore(this.touchData.placeholder, closestItem.nextSibling);
+                    }
+                }
+            }
+        } else {
+            dropZone.classList.remove('drag-over');
+        }
+    }
+
+    // タッチドラッグ終了
+    endTouchDrag(touch) {
+        const dropZone = document.getElementById('drop-zone');
+        const rect = dropZone.getBoundingClientRect();
+        
+        const isOverDropZone = (
+            touch.clientX >= rect.left &&
+            touch.clientX <= rect.right &&
+            touch.clientY >= rect.top &&
+            touch.clientY <= rect.bottom
+        );
+        
+        if (this.touchData.dragElement) {
+            // スタイルをリセット
+            this.touchData.dragElement.style.position = '';
+            this.touchData.dragElement.style.left = '';
+            this.touchData.dragElement.style.top = '';
+            this.touchData.dragElement.style.zIndex = '';
+            this.touchData.dragElement.style.pointerEvents = '';
+            this.touchData.dragElement.style.transform = '';
+            this.touchData.dragElement.classList.remove('dragging');
+            
+            if (isOverDropZone) {
+                // ドロップゾーンのヒントテキストを削除（最初のアイテムを追加する際）
+                const dropHint = dropZone.querySelector('.drop-hint');
+                if (dropHint) {
+                    dropHint.remove();
+                }
+
+                if (this.touchData.sourceIndex !== undefined) {
+                    // ゾーン内での並び替え
+                    const targetIndex = Array.from(dropZone.children).indexOf(this.touchData.placeholder);
+                    if (targetIndex !== -1 && targetIndex !== this.touchData.sourceIndex) {
+                        dropZone.insertBefore(this.touchData.dragElement, this.touchData.placeholder);
+                        this.updateArrangement();
+                        this.playMoveSound();
+                    } else {
+                        // 元の位置に戻す
+                        dropZone.insertBefore(this.touchData.dragElement, this.touchData.placeholder);
+                    }
+                } else {
+                    // プールからドロップゾーンへの移動
+                    this.moveItemToDropZone(this.touchData.dragElement.dataset.item);
+                }
+                
+                // 成功の触覚フィードバック（安全に実行）
+                try {
+                    if (navigator.vibrate && typeof navigator.vibrate === 'function') {
+                        navigator.vibrate([30, 50, 30]);
+                    }
+                } catch (e) {
+                    // 振動が許可されていない場合は無視
+                }
+            } else {
+                // ドロップ失敗の場合、元の位置に戻す
+                if (this.touchData.sourceIndex !== undefined) {
+                    dropZone.insertBefore(this.touchData.dragElement, this.touchData.placeholder);
+                }
+            }
+            
+            // プレースホルダーを削除
+            if (this.touchData.placeholder) {
+                this.touchData.placeholder.remove();
+            }
+        }
+        
+        dropZone.classList.remove('drag-over');
+        
+        // タッチデータをリセット
+        this.touchData = {
+            isDragging: false,
+            dragElement: null,
+            startX: 0,
+            startY: 0,
+            offsetX: 0,
+            offsetY: 0,
+            longPressTimer: null,
+            placeholder: null,
+            sourceIndex: undefined
+        };
     }
 
     initAudio() {
@@ -664,8 +953,15 @@ class JustArrangeGame {
         const sourceItem = document.querySelector(`[data-item="${itemData}"]`);
         if (!sourceItem || sourceItem.parentElement.id === 'drop-zone') return;
 
+        // ドロップゾーンのヒントテキストを削除
+        const dropZone = document.getElementById('drop-zone');
+        const dropHint = dropZone.querySelector('.drop-hint');
+        if (dropHint) {
+            dropHint.remove();
+        }
+
         sourceItem.classList.add('in-zone');
-        document.getElementById('drop-zone').appendChild(sourceItem);
+        dropZone.appendChild(sourceItem);
         
         this.updateArrangement();
         this.playMoveSound();
