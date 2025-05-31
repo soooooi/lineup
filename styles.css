@@ -354,9 +354,13 @@ body::-webkit-scrollbar {
 }
 
 .draggable-item.dragging {
-    opacity: 0.8;
-    transform: rotate(5deg) scale(1.1);
+    opacity: 0.9;
+    transform: rotate(5deg) scale(1.15);
     z-index: 1000;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+    border: 2px solid #667eea;
+    /* タッチドラッグ時のスムーズな移動 */
+    transition: none;
 }
 
 .draggable-item.in-zone {
@@ -599,7 +603,7 @@ body::-webkit-scrollbar {
 
 /* スコア表示 */
 #score-display {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 1);
     padding: 8px 12px;
     border-radius: 20px;
     backdrop-filter: blur(10px);
@@ -682,6 +686,8 @@ body::-webkit-scrollbar {
         overflow-x: hidden;
         /* バウンス効果を防ぐ */
         overscroll-behavior: none;
+        /* 上部に安全な余白を追加 */
+        padding-top: env(safe-area-inset-top, 10px);
     }
 
     .game-container {
@@ -701,6 +707,8 @@ body::-webkit-scrollbar {
         /* フレックスレイアウトで高さを効率的に使用 */
         display: flex;
         flex-direction: column;
+        /* 上部に安全な余白を確保 */
+        padding-top: clamp(15px, 4vw, 25px);
     }
 
     .game-header {
@@ -709,6 +717,8 @@ body::-webkit-scrollbar {
         /* スコア表示のために相対位置を設定 */
         position: relative;
         flex-shrink: 0;
+        /* 上部余白を追加してタイトル見切れを防止 */
+        margin-top: clamp(10px, 2.5vw, 20px);
     }
 
     .game-title {
@@ -829,24 +839,29 @@ body::-webkit-scrollbar {
         border-radius: 20px;
     }
 
-    /* モバイルでのスコア表示をヘッダー部分にコンパクト配置 */
+    /* モバイルでのスコア表示を改善 */
     #score-display {
         position: absolute;
-        top: 15px;
-        right: 0;
-        font-size: clamp(0.7rem, 2vw, 0.8rem);
-        padding: 6px 10px;
-        border-radius: 10px;
+        top: 5px;
+        right: 5px;
+        font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+        padding: 8px 12px;
+        border-radius: 15px;
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(102, 126, 234, 0.2);
-        /* 最大幅を設定してテキストの改行を制御 */
-        max-width: 90px;
+        /* スコア表示のサイズを拡大 */
+        max-width: 140px;
+        min-width: 100px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         z-index: 200;
+        /* より良い視認性のために */
+        color: #667eea;
+        font-weight: 600;
+        text-align: center;
     }
 
     .progress-container {
@@ -909,15 +924,24 @@ body::-webkit-scrollbar {
 
 /* 横向きスマートフォン対応 */
 @media (max-width: 768px) and (orientation: landscape) {
+    body {
+        /* 横向きでも安全な上部余白を確保 */
+        padding-top: env(safe-area-inset-top, 5px);
+    }
+    
     .game-container {
         height: 100vh;
         display: grid;
         grid-template-rows: auto 1fr;
         gap: min(1vh, 10px);
+        /* 横向きでも上部余白を確保 */
+        padding-top: clamp(10px, 2vh, 15px);
     }
     
     .game-header {
         margin-bottom: 0;
+        /* 横向きでの上部余白 */
+        margin-top: clamp(5px, 1.5vh, 12px);
     }
     
     .game-main {
@@ -938,6 +962,16 @@ body::-webkit-scrollbar {
     .items-pool {
         margin-bottom: min(1vh, 10px);
     }
+    
+    /* 横向きモードでのスコア表示調整 */
+    #score-display {
+        top: 3px;
+        right: 3px;
+        font-size: clamp(0.7rem, 2vh, 0.8rem);
+        padding: 6px 10px;
+        max-width: 120px;
+        min-width: 90px;
+    }
 }
 
 /* iOS Safari の viewport 調整 */
@@ -950,6 +984,8 @@ body::-webkit-scrollbar {
             /* より強力なバウンス効果制御 */
             overscroll-behavior-y: none;
             -webkit-overscroll-behavior-y: none;
+            /* iOS notch対応の上部余白 */
+            padding-top: max(env(safe-area-inset-top, 0px), 15px);
         }
         
         .game-container {
@@ -959,12 +995,30 @@ body::-webkit-scrollbar {
             -webkit-overscroll-behavior: none;
             /* スムーズスクロールを有効化 */
             -webkit-overflow-scrolling: touch;
+            /* iOS Safari用の追加上部余白 */
+            padding-top: max(env(safe-area-inset-top, 0px), clamp(20px, 5vw, 30px));
         }
         
-        /* タッチイベントでの背景固定を防ぐ */
+        .game-header {
+            /* iOS Safari用のタイトル上部余白調整 */
+            margin-top: clamp(15px, 4vw, 25px);
+            /* より安全な上部余白 */
+            padding-top: max(env(safe-area-inset-top, 0px), 10px);
+        }
+        
+        /* iOS Safari用のスコア表示調整 */
+        #score-display {
+            /* notchを考慮した位置調整 */
+            top: max(env(safe-area-inset-top, 0px), 8px);
+            right: max(env(safe-area-inset-right, 0px), 8px);
+        }
+        
+        /* タッチエリアでの背景固定を防ぐ */
         html {
             /* 背景の固定を防ぐ */
             background: inherit;
+            /* iOS Safari用のスクロール調整 */
+            height: -webkit-fill-available;
         }
     }
 }

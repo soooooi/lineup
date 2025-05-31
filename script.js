@@ -594,8 +594,15 @@ class JustArrangeGame {
             
             // ドラッグ中の要素の位置を更新
             if (this.touchData.dragElement) {
-                const x = touch.clientX - this.touchData.offsetX;
-                const y = touch.clientY - this.touchData.offsetY;
+                // 指の位置とアイテムの中心を合わせるための計算
+                // elementの中心に合わせるためのオフセット計算
+                const elementRect = this.touchData.dragElement.getBoundingClientRect();
+                const elementCenterOffsetX = elementRect.width / 2;
+                const elementCenterOffsetY = elementRect.height / 2;
+                
+                // 指の位置を中心として要素を配置
+                const x = touch.clientX - elementCenterOffsetX;
+                const y = touch.clientY - elementCenterOffsetY;
                 
                 this.touchData.dragElement.style.position = 'fixed';
                 this.touchData.dragElement.style.left = x + 'px';
@@ -692,9 +699,10 @@ class JustArrangeGame {
         this.touchData.isDragging = true;
         this.touchData.dragElement = element;
         
-        const rect = element.getBoundingClientRect();
-        this.touchData.offsetX = touch.clientX - rect.left;
-        this.touchData.offsetY = touch.clientY - rect.top;
+        // オフセット計算を削除し、要素の中心を基準とする
+        // const rect = element.getBoundingClientRect();
+        // this.touchData.offsetX = touch.clientX - rect.left;
+        // this.touchData.offsetY = touch.clientY - rect.top;
         
         // プレースホルダーを作成
         this.touchData.placeholder = element.cloneNode(true);
@@ -722,9 +730,10 @@ class JustArrangeGame {
         this.touchData.dragElement = element;
         this.touchData.sourceIndex = Array.from(element.parentNode.children).indexOf(element);
         
-        const rect = element.getBoundingClientRect();
-        this.touchData.offsetX = touch.clientX - rect.left;
-        this.touchData.offsetY = touch.clientY - rect.top;
+        // オフセット計算を削除し、要素の中心を基準とする
+        // const rect = element.getBoundingClientRect();
+        // this.touchData.offsetX = touch.clientX - rect.left;
+        // this.touchData.offsetY = touch.clientY - rect.top;
         
         // プレースホルダーを作成
         this.touchData.placeholder = element.cloneNode(true);
