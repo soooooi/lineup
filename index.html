@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ならべるだけ - Just Arrange</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1 class="game-title">ならべるだけ</h1>
+            <p class="game-author">by そーい</p>
+            <div class="stage-info">
+                <span class="stage-label">ステージ</span>
+                <span class="stage-number" id="current-stage" style="display: inline-block; visibility: visible; font-weight: bold;">1</span>
+            </div>
+            
+            <!-- 音量コントロール追加 -->
+            <div class="audio-controls">
+                <button class="audio-toggle-btn" id="audio-toggle-btn" title="音量ミュート/ミュート解除">
+                    🔇
+                </button>
+                <div class="volume-control">
+                    <span class="volume-icon">🔊</span>
+                    <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="0" title="音量調整">
+                    <span class="volume-percentage" id="volume-percentage">0%</span>
+                </div>
+            </div>
+            
+            <!-- プログレスバー追加 -->
+            <div class="progress-container">
+                <div class="progress-fill" style="width: 0%;"></div>
+            </div>
+            <div class="progress-text">0/11</div>
+        </header>
+
+        <main class="game-main">
+            <div class="theme-hint" id="theme-hint">
+                順番には意味がある...
+            </div>
+
+            <div class="arrangement-area" id="arrangement-area">
+                <div class="drop-zone" id="drop-zone">
+                    <p class="drop-hint">ここに並べてください</p>
+                </div>
+            </div>
+
+            <div class="items-pool" id="items-pool">
+                <!-- アイテムがここに動的に生成される -->
+            </div>
+
+            <div class="feedback-area" id="feedback-area">
+                <div class="feedback-animation" id="feedback-animation"></div>
+                <p class="feedback-text" id="feedback-text"></p>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-reset" id="reset-btn">リセット</button>
+                <button class="btn btn-skip" id="skip-btn">⏭️ スキップ</button>
+                <button class="btn btn-next" id="next-btn" style="display: none;">次のステージ</button>
+            </div>
+        </main>
+
+        <div class="particles" id="particles"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

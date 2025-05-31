@@ -1,0 +1,566 @@
+/* リセットとベース設定 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+.game-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+
+/* ヘッダー */
+.game-header {
+    text-align: center;
+    margin-bottom: 40px;
+    color: white;
+}
+
+.game-title {
+    font-size: 3rem;
+    font-weight: 300;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.game-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.8;
+    font-weight: 300;
+    margin-bottom: 20px;
+}
+
+.game-author {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    font-weight: 300;
+    margin-bottom: 20px;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.5px;
+}
+
+.stage-info {
+    background: rgba(255,255,255,0.2);
+    padding: 10px 20px;
+    border-radius: 25px;
+    display: inline-block;
+    backdrop-filter: blur(10px);
+}
+
+.stage-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.stage-number {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-left: 10px;
+}
+
+/* 音量コントロール */
+.audio-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+    padding: 8px 12px;
+    background: rgba(74, 144, 226, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(74, 144, 226, 0.2);
+}
+
+.audio-toggle-btn {
+    background: linear-gradient(135deg, #4a90e2, #357abd);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.audio-toggle-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.audio-toggle-btn.muted {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.volume-icon {
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.volume-slider {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    background: linear-gradient(to right, #4a90e2 0%, #357abd 100%);
+    border-radius: 3px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4a90e2, #357abd);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4a90e2, #357abd);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.volume-percentage {
+    font-size: 12px;
+    font-weight: 500;
+    color: #4a90e2;
+    min-width: 32px;
+    text-align: right;
+}
+
+/* メインゲームエリア */
+.game-main {
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.theme-hint {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 30px;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* 配置エリア */
+.arrangement-area {
+    margin-bottom: 40px;
+}
+
+.drop-zone {
+    min-height: 120px;
+    border: 3px dashed #ddd;
+    border-radius: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.drop-zone.drag-over {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    transform: scale(1.02);
+}
+
+.drop-hint {
+    color: #999;
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+.drop-zone:not(:empty) .drop-hint {
+    display: none;
+}
+
+/* アイテムプール */
+.items-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+    min-height: 100px;
+    padding: 20px;
+    background: rgba(247, 247, 247, 0.8);
+    border-radius: 15px;
+}
+
+/* ドラッグ可能なアイテム */
+.draggable-item {
+    width: 80px;
+    height: 80px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    cursor: grab;
+    user-select: none;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 2px solid transparent;
+    position: relative;
+}
+
+.draggable-item:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.draggable-item:active {
+    cursor: grabbing;
+    transform: scale(1.1) rotate(5deg);
+}
+
+.draggable-item.dragging {
+    opacity: 0.7;
+    transform: scale(1.1) rotate(10deg);
+    z-index: 1000;
+}
+
+.draggable-item.in-zone {
+    cursor: grab;
+    margin: 5px;
+}
+
+.draggable-item.in-zone:hover {
+    transform: translateY(-3px) scale(1.03);
+}
+
+/* フィードバックエリア */
+.feedback-area {
+    text-align: center;
+    min-height: 80px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.feedback-animation {
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+}
+
+.feedback-text {
+    font-size: 1.2rem;
+    color: #666;
+    margin-top: 10px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    line-height: 1.4;
+    transition: font-size 0.3s ease;
+}
+
+.feedback-text.show {
+    opacity: 1;
+}
+
+/* コントロールボタン */
+.controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.btn-reset {
+    background: #ff6b6b;
+    color: white;
+}
+
+.btn-reset:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+}
+
+.btn-next {
+    background: #4ecdc4;
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+.btn-next:hover {
+    background: #8ba5ff;
+    transform: translateY(-2px);
+}
+
+.btn-skip {
+    background: linear-gradient(135deg, #ff9a56, #ff6b6b);
+    color: white;
+}
+
+.btn-skip:hover {
+    background: linear-gradient(135deg, #ff8a40, #ff5555);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 154, 86, 0.4);
+}
+
+/* 成功時のアニメーション */
+@keyframes success-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.success-animation {
+    animation: success-pulse 0.6s ease-in-out;
+}
+
+.floating {
+    animation: float 2s ease-in-out infinite;
+    transition: font-size 0.2s ease;
+}
+
+.skip-animation {
+    animation: skipBounce 0.8s ease-out;
+}
+
+@keyframes skipBounce {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.1) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+/* パーティクルエフェクト */
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #ffd700;
+    border-radius: 50%;
+    animation: particle-fall 3s linear forwards;
+}
+
+@keyframes particle-fall {
+    0% {
+        opacity: 1;
+        transform: translateY(-100vh) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(100vh) rotate(720deg);
+    }
+}
+
+/* プログレスバー */
+.progress-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 4px;
+    transition: width 0.8s ease-out;
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+.progress-text {
+    text-align: center;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 5px;
+}
+
+/* 強化されたパーティクル */
+.particle.enhanced {
+    animation: particleFloat 3s linear infinite;
+    border-radius: 50%;
+    box-shadow: 0 0 10px currentColor;
+}
+
+/* メガ成功アニメーション */
+.drop-zone.mega-success {
+    animation: megaSuccess 1s ease-out;
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.8);
+}
+
+@keyframes megaSuccess {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.05) rotate(1deg); }
+    75% { transform: scale(1.02) rotate(-1deg); }
+}
+
+/* スコア表示 */
+#score-display {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+#score-display:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    .game-container {
+        padding: 10px;
+    }
+    
+    .game-title {
+        font-size: 2.5rem;
+    }
+    
+    .game-main {
+        padding: 20px;
+    }
+    
+    .draggable-item {
+        width: 70px;
+        height: 70px;
+        font-size: 2rem;
+    }
+    
+    .items-pool {
+        gap: 10px;
+    }
+    
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    #score-display {
+        top: 5px;
+        right: 5px;
+        font-size: 0.9rem;
+        padding: 6px 10px;
+    }
+    
+    .progress-container {
+        margin-bottom: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-title {
+        font-size: 2rem;
+    }
+    
+    .draggable-item {
+        width: 60px;
+        height: 60px;
+        font-size: 1.8rem;
+    }
+}
+
+/* BGMトグルボタン */
+.bgm-toggle {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #667eea;
+    border: 2px solid #667eea;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    z-index: 1001;
+}
+
+.bgm-toggle:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.bgm-toggle.active {
+    background: #667eea;
+    color: white;
+} 
