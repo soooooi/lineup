@@ -1753,7 +1753,8 @@ class JustArrangeGame {
                 color: #667eea;
                 font-weight: bold;
             `;
-            document.querySelector('.game-main').appendChild(scoreElement);
+            // game-headerに追加してヒントテキストと分離
+            document.querySelector('.game-header').appendChild(scoreElement);
         }
         scoreElement.textContent = `スコア: ${this.totalScore}`;
     }
